@@ -1,0 +1,85 @@
+<template>
+    <lightning-card>
+        <lightning-progress-indicator current-step={currentStep} variant="base" type="path" class="slds-m-bottom_large">
+            <lightning-progress-step label="Select Reports" value="step1" class="custom-progress-step" onclick={navigateToStep} data-step="1"></lightning-progress-step>
+            <lightning-progress-step label="Add Emails" value="step2" class="custom-progress-step" onclick={navigateToStep} data-step="2"></lightning-progress-step>
+            <lightning-progress-step label="Schedule And Send Email" value="step3" class="custom-progress-step" onclick={navigateToStep} data-step="3"></lightning-progress-step>
+        </lightning-progress-indicator>
+        <br>
+        <br>
+
+        <template if:true={showFirstComponentbeg}>
+            <div class="slds-grid slds-grid_align-center slds-var-m-top_medium">
+                <lightning-button label="Select Report" variant="brand" style="text-align: center;" onclick={openModal} class="slds-m-left_small slds-m-right_large"></lightning-button>
+            </div>
+            
+            <br>
+            <br>
+            <br>
+            <br>
+
+            <lightning-datatable
+                data={selectedReports}
+                columns={columns}
+                key-field="Id"
+                onrowaction={handleRowAction}
+                hide-checkbox-column="true">
+            </lightning-datatable>
+
+            <div class="slds-grid slds-grid_align-end slds-var-m-top_medium">
+                <lightning-button label="Next" variant="brand" class="slds-m-left_small slds-float_right slds-m-right_large" onclick={openSecondScreen}></lightning-button>
+            </div>
+        </template>
+
+        <template if:true={showSecondComponent}>
+            <c-email-recipients-selector 
+                onnext={handleNext} 
+                onback={handleBack}
+                recipient-email-addresses={recipientEmailAddresses}
+                additional-emails={additionalEmails}
+                subject={subject}
+                email-body={emailBody}
+                selected-email-template-name={selectedEmailTemplateName}
+                selected-email-folder={selectedEmailFolder}
+                selected-email-template-id={selectedEmailTemplateId}></c-email-recipients-selector>
+        </template>
+
+        <template if:true={showThirdComponent}>
+            <c-report-email-scheduler 
+                onback={handleBack}
+                onsave={handleSave}
+                recipient-email-addresses={recipientEmailAddresses}
+                additional-emails={additionalEmails}
+                subject={subject}
+                email-body={emailBody}
+                selected-email-template-name={selectedEmailTemplateName}
+                selected-email-folder={selectedEmailFolder}
+                selected-email-template-id={selectedEmailTemplateId}
+                selected-reports={selectedReports}>
+            </c-report-email-scheduler>
+        </template>
+
+        <template if:true={showFirstComponent}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open custom-modal-width">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={handleClose}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" size="small"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 class="slds-text-heading_medium">Report Scheduler</h2>
+                    </header>
+
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <c-report-folder-and-list onadd={handleAddReport}></c-report-folder-and-list>
+                    </div>
+
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Close" onclick={handleClose}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </lightning-card>
+</template>

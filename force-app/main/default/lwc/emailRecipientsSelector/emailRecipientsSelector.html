@@ -1,0 +1,80 @@
+<template>
+    <lightning-card title="Select Report Recipients" icon-name="standard:email_chatter">
+        <div class="slds-m-around_medium">
+            <label for="emailFolders"><b>Select Email Folder:</b></label>
+            <lightning-combobox
+                name="emailFolders"
+                value={selectedEmailFolder}
+                placeholder="Select Email Folder"
+                options={combinedFolderOptions}
+                onchange={handleEmailFolderChange}>
+            </lightning-combobox>
+        </div>
+        
+        <div class="slds-m-around_medium">
+            <label for="emailTemplates"><b>Select Email Template:</b></label>
+            <lightning-combobox
+                name="emailTemplates"
+                value={selectedEmailTemplate}
+                placeholder="Select Email Template"
+                options={emailTemplateOptions}
+                id="selectedEmailTemplate"
+                onchange={handleEmailTemplateChange}>
+            </lightning-combobox>
+        </div>
+        <div class="slds-m-around_medium">
+            <label for="subject"><b>Subject:</b></label>
+            <lightning-input type="text" id="subject" value={subject} onchange={handleSubjectChange} disabled={isTemplateSelected}></lightning-input>
+        </div>
+        <div class="slds-m-around_medium">
+            <label for="emailBody"><b>Email Body:</b></label>
+            <lightning-textarea id="emailBody" value={emailBody} onchange={handleEmailBodyChange} class="custom-textarea" disabled={isTemplateSelected}></lightning-textarea>
+        </div>
+        <div class="slds-grid slds-gutters slds-m-around_medium ">
+            <lightning-button label="Search Contacts" variant="brand" onclick={handleContactSearch}></lightning-button>
+            &nbsp;
+            <lightning-button label="Search Leads" variant="brand" onclick={handleLeadSearch}></lightning-button>
+        </div>
+       
+        <div class="slds-m-around_medium">
+            <label for="selectedEmails"><b>Selected Recipients:</b></label>
+            <lightning-textarea id="selectedEmails" value={selectedEmails} onchange={handleEmailChange} class="custom-textarea" disabled></lightning-textarea>
+            <lightning-button label="Clear All" variant="base" onclick={handleClearAll}></lightning-button>
+        </div>
+        <div class="slds-m-around_medium">
+            <label for="additionalEmails"><b>Additional Recipients:</b></label>
+            <lightning-textarea id="additionalEmails" value={additionalEmails} onchange={handleAdditionalEmailsChange} class="custom-textarea"></lightning-textarea>
+        </div>
+        <template if:true={showModal}>
+            <div class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2>{modalHeader}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <lightning-input type="search" label="Search" value={searchKey} onchange={handleSearch}></lightning-input>
+                        <template if:true={searchResults}>
+                            <lightning-datatable
+                                key-field="Id"
+                                data={filteredData}
+                                columns={columns}
+                                selected-rows={selectedRowKeysArray}
+                                onrowselection={handleRowSelection}>
+                            </lightning-datatable>
+                        </template>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Add Selected Emails" onclick={addSelectedEmails}></lightning-button>
+                        <lightning-button label="Close" onclick={closeModal}></lightning-button>
+                    </footer>
+                </div>
+            </div>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <div class="slds-grid slds-grid_align-end slds-var-m-top_medium">
+            <lightning-button label="Back" variant="brand" onclick={handleBackClick} class="slds-m-left_small slds-float_right"></lightning-button>
+            <lightning-button label="Next" variant="brand" class="slds-m-left_small slds-float_right slds-m-right_large" onclick={handleNextClick}></lightning-button>
+        </div>
+    </lightning-card>
+</template>

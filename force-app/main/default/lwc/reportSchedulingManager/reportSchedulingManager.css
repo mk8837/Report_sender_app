@@ -1,0 +1,43 @@
+/* myComponent.css */
+.custom-modal-width .slds-modal__container {
+    width: 80% !important; /* Adjust the width as needed */
+    max-width: none; /* Ensure the max-width does not override your custom width */
+}
+
+.custom-progress-step {
+    --sds-c-progress-ring-trail: var(--sds-c-color-gray-4);
+    --sds-c-progress-ring-fill: var(--sds-c-color-brand);
+    --sds-c-progress-step-current: var(--sds-c-color-brand);
+    --sds-c-progress-step-complete: var(--sds-c-color-success);
+    --sds-c-progress-step-error: var(--sds-c-color-error);
+    --sds-c-progress-step-incomplete: var(--sds-c-color-gray-4);
+}
+
+.slds-m-bottom_large {
+    margin-bottom: 2rem;
+}
+
+.slds-progress {
+    padding: 0;
+}
+
+.slds-progress__list {
+    display: flex;
+    justify-content: space-between;
+}
+
+.slds-progress__item {
+    flex: 1;
+}
+
+.slds-progress__marker {
+    background-color: var(--sds-c-color-gray-4);
+}
+
+.slds-progress__marker.slds-progress__marker_icon {
+    border: none;
+}
+
+.slds-progress__marker.slds-progress__marker_icon .slds-icon {
+    color: var(--sds-c-color-text-inverse);
+}

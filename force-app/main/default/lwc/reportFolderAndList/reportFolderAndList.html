@@ -1,0 +1,30 @@
+<template>
+    <lightning-card title="Folder And Reports" icon-name="standard:folder">
+        <div class="container">
+            <div class="left-pane">
+                <lightning-layout>
+                    <lightning-layout-item padding="around-small">
+                        <lightning-tree-grid
+                            lwc:if={hierarchyMap}
+                            columns={gridColumns}
+                            data={hierarchyMap}
+                            key-field="Id"
+                            hide-checkbox-column="true"
+                            show-row-number-column="true"
+                            onrowaction={handleFolderClick}>
+                        </lightning-tree-grid>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>
+
+            <div class="right-pane" lwc:if={selectedFolderId}>
+                <template if:true={hasReports}>
+                    <c-report-selection reports={folderReports} selected-folder-id={selectedFolderId} onreportselect={handleReportSelect}></c-report-selection>
+                </template>
+                <template if:false={hasReports}>
+                    <h1 class="slds-grid slds-grid_align-center" style="font-size: large;font-weight: bold;">No Reports Found in folder</h1>
+                </template>
+            </div>
+        </div>
+    </lightning-card>
+</template>

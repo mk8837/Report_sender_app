@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Validate_Enter_Time_Value</fullName>
+    <active>false</active>
+    <errorConditionFormula>OR(
+  MINUTE(Enter_Time_Value__c) &lt;&gt; 0,
+  MINUTE(Enter_Time_Value__c) &lt;&gt; 30
+)</errorConditionFormula>
+    <errorMessage>select time in 30 minutes interval only</errorMessage>
+</ValidationRule>
