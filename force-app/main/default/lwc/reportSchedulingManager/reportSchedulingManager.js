@@ -1,4 +1,4 @@
-import { LightningElement, track } from 'lwc';
+import { LightningElement, track ,api} from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 const columns = [
@@ -30,10 +30,12 @@ export default class ReportSchedulingManager extends LightningElement {
     @track selectedEmailTemplateName = '';
     @track selectedEmailFolder = '';
     @track selectedEmailTemplateId = '';
-
+    @api recordId;
     columns = columns;
 
     handleNext(event) {
+        // const emailRecipientsSelector = this.template.querySelector('c-email-recipients-selector');
+        // emailRecipientsSelector.handleNextClick();
         if (this.currentStep === 'step1') {
             if (this.selectedReports.length === 0) {
                 this.showNotification('Error', 'Please select at least one report before proceeding.', 'error');
@@ -147,19 +149,17 @@ export default class ReportSchedulingManager extends LightningElement {
     }
 
     handleAddReport(event) {
-        const selectedReport = event.detail.selectedReport;
-        const selectedReportName = event.detail.selectedReportName;
+        const selectedReportsDetails = event.detail.selectedReportsDetails;
 
-        const reportExists = this.selectedReports.some(report => report.Id === selectedReport);
+        selectedReportsDetails.forEach(report => {
+            const reportExists = this.selectedReports.some(existingReport => existingReport.Id === report.reportId);
 
-        if (!reportExists) {
-            if (selectedReport && selectedReportName) {
-                this.selectedReports = [...this.selectedReports, { Id: selectedReport, Name: selectedReportName }];
-                this.handleClose();
+            if (!reportExists) {
+                this.selectedReports = [...this.selectedReports, { Id: report.reportId, Name: report.reportName }];
             }
-        } else {
-            this.showNotification('Error', 'This report is already added to the list.', 'error');
-        }
+        });
+
+        this.handleClose();  // Close the modal after adding the reports
     }
 
     handleRowAction(event) {

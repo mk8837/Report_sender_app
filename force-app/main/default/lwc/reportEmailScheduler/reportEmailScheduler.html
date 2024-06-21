@@ -1,6 +1,10 @@
 <template>
     <lightning-card title="Schedule Report To Selected Email" icon-name="standard:shift_scheduling_operation">
-        <lightning-record-edit-form object-api-name={objectApiName} onsuccess={successHandler}>
+        <div class="slds-m-around_large">
+        <lightning-record-edit-form object-api-name="Report_Setting_Configuration__c" onsuccess={successHandler}>
+            <template if:true={isScheduled}>
+                <lightning-input-field field-name="Active__c" value={isActive} class="slds-hide"></lightning-input-field>
+            </template>
             <lightning-input-field field-name="Send_Type__c" onchange={handleSendTypeChange} required="true"></lightning-input-field>
             <lightning-input-field field-name="Recipient_Email_Addresses__c" value={recipientEmailAddresses} class="slds-hide"></lightning-input-field>
             <lightning-input-field field-name="Additional_Emails__c" value={additionalEmails} class="slds-hide"></lightning-input-field>
@@ -13,21 +17,21 @@
                 <lightning-input-field field-name="Schedule_Type__c" onchange={handleScheduleTypeChange} required="true"></lightning-input-field>
                
                 <template if:true={isDaily}>
-                    <lightning-input-field field-name="Time_Value__c" required="true"></lightning-input-field>
+                    <lightning-input-field field-name="Time_Value__c" required="true" data-id="time"></lightning-input-field>
                 </template>
                
                 <template if:true={isWeekly}>
-                    <lightning-input-field field-name="Time_Value__c" required="true"></lightning-input-field>
-                    <lightning-input-field field-name="Scheduled_Day__c" required="true"></lightning-input-field>
+                    <lightning-input-field field-name="Time_Value__c" required="true" data-id="time"></lightning-input-field>
+                    <lightning-input-field field-name="Scheduled_Day__c" required="true" data-id="day"></lightning-input-field>
                 </template>
                
                 <template if:true={isMonthly}>
                     <lightning-layout>
                         <lightning-layout-item size="6" class="slds-col slds-size_6-of-12">
-                            <lightning-input-field field-name="Schedule_Date__c" required="true"></lightning-input-field>
+                            <lightning-input-field field-name="Schedule_Date__c" required="true" data-id="date"></lightning-input-field>
                         </lightning-layout-item>
                         <lightning-layout-item size="6" class="slds-col slds-size_6-of-12">
-                            <lightning-input-field field-name="Time_Value__c" required="true"></lightning-input-field>
+                            <lightning-input-field field-name="Time_Value__c" required="true" data-id="time"></lightning-input-field>
                         </lightning-layout-item>
                     </lightning-layout>
                 </template>
@@ -35,8 +39,9 @@
 
             <div class="slds-grid slds-grid_align-end slds-var-m-top_medium">
                 <lightning-button label="Back" variant="brand" class="slds-m-left_small" onclick={handleBackClick}></lightning-button>
-                <lightning-button variant="brand" type="submit" label="Save" class="slds-m-left_small slds-m-right_large"></lightning-button>
+                <lightning-button variant="brand" type="submit" label="Save" class="slds-m-left_small slds-m-right_large" onclick={handleSave}></lightning-button>
             </div>
         </lightning-record-edit-form>
+    </div>
     </lightning-card>
 </template>

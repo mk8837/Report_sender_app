@@ -1,13 +1,20 @@
 <template>
     <lightning-card title="Select Reports" icon-name="standard:report">
         <div class="slds-m-around_medium">
-            <lightning-combobox
+            <lightning-checkbox-group
                 name="availableReports"
                 placeholder="Select a Report"
                 options={reportOptions}
-                value={selectedReport}
+                value={selectedReports}
                 onchange={handleReportSelection}>
-            </lightning-combobox>
+            </lightning-checkbox-group>
+            <lightning-button 
+                label="Add Report"
+                onclick={handleAddReport}
+                class="slds-m-top_medium"
+                variant="brand"
+                required="">
+            </lightning-button>
         </div>
       
     </lightning-card>

@@ -23,8 +23,9 @@
             </lightning-combobox>
         </div>
         <div class="slds-m-around_medium">
-            <label for="subject"><b>Subject:</b></label>
-            <lightning-input type="text" id="subject" value={subject} onchange={handleSubjectChange} disabled={isTemplateSelected}></lightning-input>
+            <!-- <template if:true={showSubjectError}>
+                <div class="slds-text-color_error">Subject Field is Required</div>
+            </template> -->
         </div>
         <div class="slds-m-around_medium">
             <label for="emailBody"><b>Email Body:</b></label>
@@ -34,6 +35,8 @@
             <lightning-button label="Search Contacts" variant="brand" onclick={handleContactSearch}></lightning-button>
             &nbsp;
             <lightning-button label="Search Leads" variant="brand" onclick={handleLeadSearch}></lightning-button>
+            &nbsp;
+            <lightning-button label="Search Users" variant="brand" onclick={handleUserSearch}></lightning-button>
         </div>
        
         <div class="slds-m-around_medium">

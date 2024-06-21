@@ -8,7 +8,7 @@ global class ScheduledReportBatchProcessor implements Database.Batchable<SObject
             return Database.getQueryLocator([
                 SELECT Id, Recipient_Email_Addresses__c, Additional_Emails__c, Email_Body__c, Subject__c, Time_Value__c, Scheduled_Day__c, Schedule_Date__c 
                 FROM Report_Setting_Configuration__c 
-                WHERE Time_Value__c != NULL OR Schedule_Date__c != NULL
+                WHERE (Time_Value__c != NULL OR Schedule_Date__c != NULL)  AND Active__c = true
             ]);
         }
     
