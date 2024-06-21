@@ -8,6 +8,14 @@ public with sharing class EmailTemplateSearchController {
     public static List<Lead> getLeadRecords() {
         return [SELECT Id, FirstName, LastName, Email FROM Lead WITH SECURITY_ENFORCED];
     }
+    @AuraEnabled(cacheable=true)
+    public static List<User> getUserRecords() {
+        try {
+            return [SELECT Id, FirstName, LastName, Email FROM User WHERE Email != NULL WITH SECURITY_ENFORCED];
+        } catch (Exception e) {
+            throw new AuraHandledException('Error fetching user records: ' + e.getMessage());
+        }
+    }
 
     @AuraEnabled(cacheable=true)
     public static List<Folder> getLightningEmailFolders() {

@@ -6,6 +6,7 @@ import saveReportList from '@salesforce/apex/ReportFolderHierarchyController.sav
 export default class ReportEmailScheduler extends NavigationMixin(LightningElement) {
     @track leavesReqeusts = [];
     @track columns = [];
+    @track isActive = true;
     @track noRecordsFound = false;
     @track showDetails = false;
     @track recordId;

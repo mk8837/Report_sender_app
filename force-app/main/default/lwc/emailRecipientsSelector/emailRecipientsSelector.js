@@ -4,6 +4,7 @@ import getLeadRecords from '@salesforce/apex/EmailTemplateSearchController.getLe
 import getLightningEmailFolders from '@salesforce/apex/EmailTemplateSearchController.getLightningEmailFolders';
 import getClassicEmailFolders from '@salesforce/apex/EmailTemplateSearchController.getClassicEmailFolders';
 import getAllEmailTemplates from '@salesforce/apex/EmailTemplateSearchController.getAllEmailTemplates';
+import getUserRecords from '@salesforce/apex/EmailTemplateSearchController.getUserRecords';
 
 export default class EmailRecipientsSelector extends LightningElement {
     @track showModal = false;
@@ -23,11 +24,14 @@ export default class EmailRecipientsSelector extends LightningElement {
     @track emailBody = '';
     @track emailBodyHtml = '';
     @track isTemplateSelected = false;
+    //@track showSubjectError = false;
 
     contactRowKeys = new Set();
     leadRowKeys = new Set();
     selectedContacts = [];
     selectedLeads = [];
+    userRowKeys = new Set();
+    selectedUsers = [];
 
     @api recipientEmailAddresses;
     @api additionalEmails;
@@ -89,19 +93,44 @@ export default class EmailRecipientsSelector extends LightningElement {
     }
 
     combineFolderOptions(newFolders) {
-        this.combinedFolderOptions = [...this.combinedFolderOptions, ...newFolders];
+        // Add "None" option only if it is not already present
+        if (!this.combinedFolderOptions.some(option => option.value === 'None')) {
+            this.combinedFolderOptions = [
+                { label: 'None', value: 'None', id: '', type: '' },
+                ...this.combinedFolderOptions,
+                ...newFolders
+            ];
+        } else {
+            this.combinedFolderOptions = [
+                ...this.combinedFolderOptions,
+                ...newFolders
+            ];
+    }
     }
 
     handleEmailFolderChange(event) {
         this.selectedEmailFolder = event.target.value;
         const selectedFolder = this.combinedFolderOptions.find(folder => folder.value === this.selectedEmailFolder);
         this.selectedEmailFolderId = selectedFolder ? selectedFolder.id : '';
+    
+        if (this.selectedEmailFolder === 'None') {
+            // Clear the selected email template, subject, and body
+            this.selectedEmailTemplate = '';
+            this.subject = '';
+            this.emailBody = '';
+            this.emailBodyHtml = '';
+            this.selectedEmailTemplateName = '';
+            this.isTemplateSelected = false;
+            this.emailTemplateOptions = [];
+        } else {
         this.updateEmailTemplateOptions();
+        }
     }
+    
 
     updateEmailTemplateOptions() {
         const selectedFolderId = this.selectedEmailFolderId;
-        if (this.templates && this.templates.length > 0) {
+        if (selectedFolderId && this.templates && this.templates.length > 0) {
             this.emailTemplateOptions = this.templates
                 .filter(template => template.FolderId === selectedFolderId)
                 .map(template => ({
@@ -217,8 +246,10 @@ export default class EmailRecipientsSelector extends LightningElement {
         this.selectedEmails = '';
         this.contactRowKeys.clear();
         this.leadRowKeys.clear();
+        this.userRowKeys.clear(); // Ensure userRowKeys is also cleared
         this.selectedContacts = [];
         this.selectedLeads = [];
+        this.selectedUsers = []; // Reset selectedUsers array
         this.updateSelectedRowKeys();
     }
 
@@ -227,7 +258,7 @@ export default class EmailRecipientsSelector extends LightningElement {
         const currentSelectedEmails = new Set(this.selectedEmails.split(', ').filter(email => email.trim()));
 
         const selectedIds = new Set(selectedRows.map(row => row.Id));
-        const allSelectedRows = this.selectedContacts.concat(this.selectedLeads);
+        const allSelectedRows = this.selectedContacts.concat(this.selectedLeads).concat(this.selectedUsers || []);
 
         allSelectedRows.forEach(row => {
             if (!selectedIds.has(row.Id)) {
@@ -241,9 +272,12 @@ export default class EmailRecipientsSelector extends LightningElement {
         } else if (this.modalHeader === 'Lead Records') {
             this.leadRowKeys = new Set(selectedRows.map(row => row.Id));
             this.selectedLeads = selectedRows;
+        } else if (this.modalHeader === 'User Records') {
+            this.userRowKeys = new Set(selectedRows.map(row => row.Id));
+            this.selectedUsers = selectedRows;
         }
 
-        this.selectedContacts.concat(this.selectedLeads).forEach(row => {
+        this.selectedContacts.concat(this.selectedLeads).concat(this.selectedUsers || []).forEach(row => {
             if (selectedIds.has(row.Id)) {
                 currentSelectedEmails.add(row.Email);
             }
@@ -254,7 +288,7 @@ export default class EmailRecipientsSelector extends LightningElement {
     }
 
     addSelectedEmails() {
-        const newEmails = this.selectedContacts.concat(this.selectedLeads).map(row => row.Email);
+        const newEmails = this.selectedContacts.concat(this.selectedLeads).concat(this.selectedUsers || []).map(row => row.Email);
         const existingEmailsArray = this.selectedEmails.split(', ').filter(email => email.trim());
         const allEmailsSet = new Set([...existingEmailsArray, ...newEmails]);
         this.selectedEmails = [...allEmailsSet].join(', ');
@@ -267,6 +301,8 @@ export default class EmailRecipientsSelector extends LightningElement {
             this.selectedRowKeysArray = [...this.contactRowKeys];
         } else if (this.modalHeader === 'Lead Records') {
             this.selectedRowKeysArray = [...this.leadRowKeys];
+        } else if (this.modalHeader === 'User Records') {
+            this.selectedRowKeysArray = [...this.userRowKeys];
         }
     }
 
@@ -288,6 +324,9 @@ export default class EmailRecipientsSelector extends LightningElement {
 
     handleSubjectChange(event) {
         this.subject = event.target.value;
+        // if (this.subject) {
+        //     this.showSubjectError = false; // Clear error state when subject is entered
+        // }
     }
 
     handleEmailBodyChange(event) {
@@ -295,6 +334,12 @@ export default class EmailRecipientsSelector extends LightningElement {
     }
 
     handleNextClick() {
+
+        // if (!this.subject) {
+        //     this.showSubjectError = true;
+        //     return; // Prevent further actions if validation fails
+        // }
+
         const nextEvent = new CustomEvent('next', {
             detail: {
                 recipientEmailAddresses: this.selectedEmails,
@@ -329,4 +374,26 @@ export default class EmailRecipientsSelector extends LightningElement {
         this.selectedEmailFolderId = selectedFolder ? selectedFolder.id : '';
         this.updateEmailTemplateOptions();
     }
+    handleUserSearch() {
+        getUserRecords()
+            .then(result => {
+                if (result && result.length > 0) {
+                    this.modalHeader = 'User Records';
+                    this.searchResults = result;
+                    this.columns = [
+                        { label: 'First Name', fieldName: 'FirstName' },
+                        { label: 'Last Name', fieldName: 'LastName' },
+                        { label: 'Email', fieldName: 'Email' }
+                    ];
+                    this.showModal = true;
+                    this.updateSelectedRowKeys();
+                } else {
+                    // Handle no records found
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user records:', error);
+            });
+    }
+    
 }

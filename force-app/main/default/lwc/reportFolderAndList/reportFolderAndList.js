@@ -1,9 +1,12 @@
-import { LightningElement, api, track, wire } from 'lwc';
+import { LightningElement, api, track } from 'lwc';
 import getAllFolderHierarchy from '@salesforce/apex/ReportFolderHierarchyController.getAllFolderHierarchy';
 import getReportsByFolderId from '@salesforce/apex/ReportFolderHierarchyController.getReportsByFolderId';
 
 const COLUMNS_DEFINITION_BASIC = [
     { label: 'Folder Name', fieldName: 'Name', type: 'button', iconName: 'utility:open_folder', typeAttributes: { label: { fieldName: 'Name' }, variant: 'base', iconName: 'utility:open_folder' }, sortable: true },
+];
+const REPORT_COLUMNS = [
+    { label: 'Report Name', fieldName: 'reportName', type: 'text' }
 ];
 
 export default class ReportFolderAndList extends LightningElement {
@@ -11,9 +14,12 @@ export default class ReportFolderAndList extends LightningElement {
     @track selectedFolderId;
     @track folderReports = [];
     @track hasReports = false;
+    @track selectedReportsData = [];
 
     @api gridColumns = COLUMNS_DEFINITION_BASIC;
     @api primaryKey = 'Id';
+
+    @api reportColumns = REPORT_COLUMNS;
 
     connectedCallback() {
         getAllFolderHierarchy().then(result => {
@@ -62,12 +68,18 @@ export default class ReportFolderAndList extends LightningElement {
     }
 
     handleReportSelect(event) {
-        const selectedReport = event.detail.reportId;
-        const selectedReportName = event.detail.reportName;
+        const selectedReportsDetails = event.detail.selectedReportsDetails;
 
-        if (selectedReport && selectedReportName) {
-            this.dispatchEvent(new CustomEvent('add', {
-                detail: { selectedReport, selectedReportName }
+        selectedReportsDetails.forEach(report => {
+            const reportExists = this.selectedReportsData.some(existingReport => existingReport.reportId === report.reportId);
+
+            if (!reportExists) {
+                this.selectedReportsData = [...this.selectedReportsData, { reportId: report.reportId, reportName: report.reportName }];
+            }
+        });
+
+        this.dispatchEvent(new CustomEvent('reportselect', {
+            detail: { selectedReportsDetails: this.selectedReportsData }
             }));
         }
     }

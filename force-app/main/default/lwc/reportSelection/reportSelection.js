@@ -4,8 +4,7 @@ import getReportsByFolderId from '@salesforce/apex/ReportFolderHierarchyControll
 export default class ReportSelection extends LightningElement {
     @api selectedFolderId;
     @track reportOptions = [];
-    @track selectedReport = '';
-    @track showTable = false;
+    @track selectedReports = [];
    
     @wire(getReportsByFolderId, { folderId: '$selectedFolderId' })
     wiredReports({ error, data }) {
@@ -17,15 +16,17 @@ export default class ReportSelection extends LightningElement {
     }
 
     handleReportSelection(event) {
-        this.selectedReport = event.detail.value;
-        const selectedReportName = this.reportOptions.find(option => option.value === this.selectedReport).label;
-        this.showTable = true;
+        this.selectedReports = event.detail.value;
+    }
+
+    handleAddReport() {
+        const selectedReportsDetails = this.selectedReports.map(reportId => {
+            const report = this.reportOptions.find(option => option.value === reportId);
+            return { reportId, reportName: report.label };
+        });
 
         this.dispatchEvent(new CustomEvent('reportselect', {
-            detail: {
-                reportId: this.selectedReport,
-                reportName: selectedReportName
-            }
+            detail: { selectedReportsDetails }
         }));
     }
 }

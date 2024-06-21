@@ -1,0 +1,5 @@
+<aura:component implements="force:hasRecordId,lightning:actionOverride,flexipage:availableForRecordHome" access="global">
+    <aura:attribute name="recordId" type="String" />
+    <lightning:overlayLibrary aura:id="overlayLib" />
+    <aura:handler name="init" value="{!this}" action="{!c.openModal}" />
+</aura:component>
